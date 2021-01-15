@@ -7,11 +7,11 @@ function MyArray() {
   }
 }
 
-function myArrayPrototype() {
+function MyArrayPrototype() {
 
-  this.push = function push() {           // insert item to array[array.length]        
-    for (let i = 0; i < arguments.length; i++) {  // insert many items to array
-      this[this.length++] = arguments[i]
+  this.push = function push(...args) {           // insert item to array[array.length]        
+    for (let i = 0; i < args.length; i++) {  // insert many items to array
+      this[this.length++] = args[i]
     }
     return this.length;
   };
@@ -24,12 +24,14 @@ function myArrayPrototype() {
     }
   };
 
-  this.unshift = function unshift(item) {     // insert item to array[0]
-    for (let i = this.length; i > 0; i--) {
-      this[i] = this[i - 1];
+  this.unshift = function unshift(...args) {     // insert items to array[0]
+    for (let i = this.length + args.length - 1; i >= args.length; i--) {
+      this[i] = this[i - args.length];
     }
-    this[0] = item;
-    return ++this.length;
+    for (let i = 0; i < args.length; i++) {
+      this[i] = args[i];
+    }
+    return this.length += args.length;
   };
 
   this.shift = function shift() {             // delete item array[0]
@@ -66,41 +68,21 @@ function myArrayPrototype() {
     return this;
   };
 
-  this.forEach = function forEach(expression) {   // do some function on each element of array, return changed (mutated) array
+  this.forEach = function forEach(callback) {   // do some function on each element of array, return changed (mutated) array
     for (let i = 0; i < this.length; i++) {
-      this[i] = expression(this[i], i, this);
+      callback(this[i], i, this);
     }
   };
 
-  this.map = function map(expression) {           // do dome function on each element of array, and return new array
+  this.map = function map(callback) {           // do dome function on each element of array, and return new array
     const newArr = new MyArray();
     for (let i = 0; i < this.length; i++) {
-      newArr[i] = expression(this[i], i, this);
+      newArr[i] = callback(this[i], i, this);
       newArr.length++;
     }
     return newArr;
   };
 }
 
-MyArray.prototype = new myArrayPrototype();
+MyArray.prototype = new MyArrayPrototype();
 const myArray = new MyArray();
-
-const array1 = new MyArray('a', 'b', 'c');
-const array2 = new MyArray('d', 'e', 'f');
-let array3 = array1.concat(array2);
-console.log(array3);
-console.log(array3.reverse());
-
-function addSomeValue(element, index, array) {
-  return element = 'a' + element + 5;
-}
-
-function addStar(element, index, array) {
-  return element = element + '*';
-}
-
-array3.forEach(addSomeValue);
-console.log(array3);
-array3.forEach(addSomeValue);
-console.log(array3);
-console.log(array3.map(addStar));
